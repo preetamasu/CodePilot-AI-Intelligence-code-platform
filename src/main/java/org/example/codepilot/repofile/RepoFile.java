@@ -1,12 +1,20 @@
 package org.example.codepilot.repofile;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.example.codepilot.CodeRepoCloning.CodeRepo;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 import java.util.UUID;
 
+@Data
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class RepoFile {
     @Id
