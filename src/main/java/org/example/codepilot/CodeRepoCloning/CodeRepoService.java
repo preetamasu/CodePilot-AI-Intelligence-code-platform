@@ -177,8 +177,9 @@ public class CodeRepoService {
                     RepoFile repoFile = new RepoFile();
                     repoFile.setRepository(codeRepo);
                     repoFile.setContent(content);
+                    repoFile.setSizeBytes(fileSize);
                     repoFile.setLanguage(language);
-                    repoFile.setPath(file.toString());
+                    repoFile.setPath(file.toString().replace('\\', '/'));
                     repoFileJpaRepository.save(repoFile);
                 }
                 catch(Exception exception){
