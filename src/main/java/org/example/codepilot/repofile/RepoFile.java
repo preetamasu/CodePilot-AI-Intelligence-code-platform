@@ -26,7 +26,7 @@ public class RepoFile {
 
     @ManyToOne
     @JoinColumn(
-            name = "repository_id"
+            name = "repoFile_id"
     )
     private CodeRepo repository;
 
@@ -36,7 +36,7 @@ public class RepoFile {
     @Column(length = 50)
     private String language;
 
-    @Lob
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 

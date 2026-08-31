@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.codepilot.repofile.RepoFile;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -25,6 +26,9 @@ public class CodeRepo {
 
     @Column(nullable = false)
     private String name;
+
+
+
 
     @Column(nullable = false, unique = true, length = 1000)
     private String url;

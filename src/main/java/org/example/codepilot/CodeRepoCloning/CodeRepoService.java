@@ -2,6 +2,7 @@ package org.example.codepilot.CodeRepoCloning;
 
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.api.Git;
+import org.example.codepilot.AiClient.AiClient;
 import org.example.codepilot.repofile.RepoFile;
 import org.example.codepilot.repofile.RepoFileJpaRepository;
 import org.springframework.http.HttpStatus;
@@ -12,10 +13,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -23,6 +21,8 @@ import java.util.stream.Stream;
 public class CodeRepoService {
 
     private static final long MAX_FILE_SIZE = 1_000_000;
+
+    private final AiClient aiClient;
 
     private static final Set<String> IGNORED_DIRECTORIES = Set.of(
             ".git",
@@ -120,9 +120,11 @@ public class CodeRepoService {
                             .call()
                     ){
                 readAndSaveFiles(cloneDirectory, codeRepo);
-                 codeRepo.setStatus(RepositoryStatus.CLONING);
+                 codeRepo.setStatus(RepositoryStatus.INDEXING);
                  codeRepositoryJpa.save(codeRepo);
             }
+
+            aiClient.indexRepository(codeRepo.getId().toString());
 
             codeRepo.setStatus(RepositoryStatus.READY);
             codeRepo.setErrorMessage(null);
@@ -147,6 +149,7 @@ public class CodeRepoService {
     }
 
     private void readAndSaveFiles(Path cloneDirectory, CodeRepo codeRepo) throws Exception{
+        List<RepoFile> repoFiles = new ArrayList<>();
 
         try(Stream<Path> paths = Files.walk(cloneDirectory)){
             List<Path> files = paths.filter(Files::isRegularFile)
@@ -179,15 +182,15 @@ public class CodeRepoService {
                     repoFile.setContent(content);
                     repoFile.setSizeBytes(fileSize);
                     repoFile.setLanguage(language);
-                    repoFile.setPath(file.toString().replace('\\', '/'));
-                    repoFileJpaRepository.save(repoFile);
+                    repoFile.setPath(relativePath.toString().replace('\\', '/'));
+                    repoFiles.add(repoFile);
                 }
                 catch(Exception exception){
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
                 }
             }
         }
-
+        repoFileJpaRepository.saveAll(repoFiles);
 
     }
 
