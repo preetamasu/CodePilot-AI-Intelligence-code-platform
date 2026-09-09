@@ -4,6 +4,7 @@ import java.util.List;
 
 public record FastApiResponse(
         String answer,
-        List<String> sources
+        List<FastApiSource> sources,
+        String thread_id
 ) {
 }

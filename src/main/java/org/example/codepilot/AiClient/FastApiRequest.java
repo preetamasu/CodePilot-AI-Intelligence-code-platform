@@ -1,9 +1,10 @@
 package org.example.codepilot.AiClient;
 
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record FastApiRequest(
-        String repo_id,
-        String question
+        @JsonProperty("repo_id") String repositoryId,
+        String question,
+        @JsonProperty("thread_id") String threadId
 ) {
 }

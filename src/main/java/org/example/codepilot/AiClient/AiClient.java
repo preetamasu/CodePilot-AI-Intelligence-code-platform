@@ -7,9 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
-import javax.print.attribute.standard.Media;
 import java.net.http.HttpClient;
-import java.util.UUID;
 
 @Service
 public class AiClient {
@@ -33,16 +31,17 @@ public class AiClient {
     public void indexRepository(String repositoryId)
     {
         restClient.post()
-                .uri("/repositories/{repositoryId}/index",repositoryId)
+                .uri("/api/v1/ai/repositories/{repositoryId}/index",repositoryId)
                 .retrieve()
                 .toBodilessEntity();
     }
 
-    public FastApiResponse ask(String repositoryId, String question) {
+    public FastApiResponse ask(String repositoryId, String question, String threadId) {
         try {
             FastApiRequest request = new FastApiRequest(
                     repositoryId,
-                    question
+                    question,
+                    threadId
             );
 
             return restClient.post()

@@ -120,10 +120,10 @@ public class CodeRepoService {
                             .call()
                     ){
                 readAndSaveFiles(cloneDirectory, codeRepo);
-                 codeRepo.setStatus(RepositoryStatus.INDEXING);
-                 codeRepositoryJpa.save(codeRepo);
+                codeRepositoryJpa.save(codeRepo);
             }
 
+            codeRepo.setStatus(RepositoryStatus.INDEXING);
             aiClient.indexRepository(codeRepo.getId().toString());
 
             codeRepo.setStatus(RepositoryStatus.READY);
