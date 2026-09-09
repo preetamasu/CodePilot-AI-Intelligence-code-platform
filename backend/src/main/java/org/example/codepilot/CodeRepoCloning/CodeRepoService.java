@@ -67,13 +67,21 @@ public class CodeRepoService {
     public CodeRepoResponse create(CreateRepoRequest createRepoRequest){
         String url = createRepoRequest.url();
 
-        if(codeRepositoryJpa.existsByUrl(url)){
-            return codeRepositoryJpa.findByUrl(url)
-                    .map(CodeRepoResponse::repoResponse)
-                    .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.NOT_FOUND,
-                            "Repository not found"
-                    ));
+        Optional<CodeRepo> existingRepo = codeRepositoryJpa.findByUrl(url);
+
+        if(existingRepo.isPresent()){
+            CodeRepo codeRepo = existingRepo.get();
+
+            if(codeRepo.getStatus() == RepositoryStatus.FAILED){
+               // repoFileJpaRepository.deleteByRepositoryId(codeRepo.getId());
+                codeRepo.setStatus(RepositoryStatus.QUEUED);
+                codeRepo.setErrorMessage(null);
+                codeRepositoryJpa.save(codeRepo);
+
+                cloneRepository(codeRepo);
+            }
+
+            return CodeRepoResponse.repoResponse(codeRepo);
         }
 
         CodeRepo codeRepo = new CodeRepo();
@@ -145,29 +153,30 @@ public class CodeRepoService {
             );
         }
         finally {
-            deleteDirectory(cloneDirectory);
-            System.out.println("Repository cloned at: " + cloneDirectory);
+            //deleteDirectory(cloneDirectory);
+            System.out.println("Repository clone temp directory processed: " + cloneDirectory);
         }
     }
 
-    private void deleteDirectory(Path directory) {
-        if (directory == null || !Files.exists(directory)) {
-            return;
-        }
-
-        try (Stream<Path> paths = Files.walk(directory)) {
-            paths.sorted(Comparator.reverseOrder())
-                    .forEach(path -> {
-                        try {
-                            Files.deleteIfExists(path);
-                        } catch (IOException exception) {
-                            System.err.println("Unable to delete temp path: " + path);
-                        }
-                    });
-        } catch (IOException exception) {
-            System.err.println("Unable to clean temp repository directory: " + directory);
-        }
-    }
+//    private void deleteDirectory(Path directory) {
+//        if (directory == null || !Files.exists(directory)) {
+//            return;
+//        }
+//
+//        try (Stream<Path> paths = Files.walk(directory)) {
+//            paths.sorted(Comparator.reverseOrder())
+//                    .forEach(path -> {
+//                        try {
+//                            path.toFile().setWritable(true);
+//                            Files.deleteIfExists(path);
+//                        } catch (IOException exception) {
+//                            System.err.println("Unable to delete temp path: " + path);
+//                        }
+//                    });
+//        } catch (IOException exception) {
+//            System.err.println("Unable to clean temp repository directory: " + directory);
+//        }
+//    }
 
     private void readAndSaveFiles(Path cloneDirectory, CodeRepo codeRepo) throws Exception{
         List<RepoFile> repoFiles = new ArrayList<>();
