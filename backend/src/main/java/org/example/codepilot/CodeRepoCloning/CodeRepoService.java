@@ -68,10 +68,12 @@ public class CodeRepoService {
         String url = createRepoRequest.url();
 
         if(codeRepositoryJpa.existsByUrl(url)){
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Github repo already exists"
-            );
+            return codeRepositoryJpa.findByUrl(url)
+                    .map(CodeRepoResponse::repoResponse)
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.NOT_FOUND,
+                            "Repository not found"
+                    ));
         }
 
         CodeRepo codeRepo = new CodeRepo();
@@ -79,8 +81,6 @@ public class CodeRepoService {
         codeRepo.setName(extractUserName(url));
         codeRepo.setUrl(createRepoRequest.url());
         codeRepo.setStatus(RepositoryStatus.QUEUED);
-        cloneRepository(codeRepo);
-
         codeRepo = codeRepositoryJpa.save(codeRepo);
 
         cloneRepository(codeRepo);
