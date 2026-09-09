@@ -18,7 +18,7 @@ class AiControllerTest {
         RecordingAiClient aiClient = new RecordingAiClient();
         AiController controller = new AiController(aiClient);
 
-        controller.ask("repository-123", new PublicDTO("What does this do?", "thread-456"));
+        controller.ask(new PublicDTO("repository-123", "What does this do?", "thread-456"));
 
         assertEquals("repository-123", aiClient.repositoryId);
         assertEquals("What does this do?", aiClient.question);
@@ -27,7 +27,7 @@ class AiControllerTest {
 
     @Test
     void rejectsBlankThreadId() {
-        var violations = validator.validate(new PublicDTO("What does this do?", " "));
+        var violations = validator.validate(new PublicDTO("repository-123", "What does this do?", " "));
 
         assertFalse(violations.isEmpty());
     }
@@ -47,7 +47,7 @@ class AiControllerTest {
             this.repositoryId = repositoryId;
             this.question = question;
             this.threadId = threadId;
-            return new FastApiResponse("answer", null);
+            return new FastApiResponse("answer", java.util.List.of(), threadId);
         }
     }
 }

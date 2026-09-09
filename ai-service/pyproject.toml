@@ -1,0 +1,28 @@
+[project]
+name = "codepilot-agent"
+version = "0.1.0"
+requires-python = ">=3.11,<3.15"
+dependencies = [
+  "fastapi",
+  "uvicorn",
+  "sqlalchemy",
+  "psycopg",
+  "pydantic",
+  "pydantic-settings",
+  "python-dotenv",
+  "langchain",
+  "langchain-core",
+  "langchain-community",
+  "sentence-transformers",
+  "langchain-text-splitters",
+  "faiss-cpu",
+  "langchain-aws",
+  "chromadb",
+  "bedrock-agentcore",
+  "supabase",
+  "boto3",
+  "langgraph",
+]
+
+[tool.agentcore]
+entrypoint = "agentcore_runtime.py"

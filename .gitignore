@@ -32,3 +32,21 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### CodePilot monorepo ###
+backend/target/
+backend/.env
+
+ai-service/.env
+ai-service/venv/
+ai-service/.venv/
+ai-service/__pycache__/
+ai-service/**/__pycache__/
+ai-service/**/*.pyc
+ai-service/emedding_cache/
+ai-service/embedding_cache/
+ai-service/agentcore-project/
+
+frontend/node_modules/
+frontend/dist/
+frontend/.env
