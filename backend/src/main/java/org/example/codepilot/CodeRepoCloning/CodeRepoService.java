@@ -10,9 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -143,8 +145,27 @@ public class CodeRepoService {
             );
         }
         finally {
-            //deleteDirectory(cloneDirectory);
+            deleteDirectory(cloneDirectory);
             System.out.println("Repository cloned at: " + cloneDirectory);
+        }
+    }
+
+    private void deleteDirectory(Path directory) {
+        if (directory == null || !Files.exists(directory)) {
+            return;
+        }
+
+        try (Stream<Path> paths = Files.walk(directory)) {
+            paths.sorted(Comparator.reverseOrder())
+                    .forEach(path -> {
+                        try {
+                            Files.deleteIfExists(path);
+                        } catch (IOException exception) {
+                            System.err.println("Unable to delete temp path: " + path);
+                        }
+                    });
+        } catch (IOException exception) {
+            System.err.println("Unable to clean temp repository directory: " + directory);
         }
     }
 
