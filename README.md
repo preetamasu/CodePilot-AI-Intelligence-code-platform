@@ -17,6 +17,8 @@ Run this service from the `backend` directory.
 
 ## Tech Stack
 
+Backend:
+
 - Java 21
 - Spring Boot 4.1
 - Spring Web MVC
@@ -26,6 +28,27 @@ Run this service from the `backend` directory.
 - JGit
 - Spring RestClient
 - Maven wrapper
+
+AI service:
+
+- Python
+- FastAPI
+- Uvicorn
+- LangGraph
+- LangChain
+- ChromaDB / FAISS vector search
+- Sentence Transformers
+- Supabase
+- boto3
+- AWS Bedrock / AgentCore runtime adapter
+
+Frontend:
+
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS
+- Lucide React icons
 
 ## Runtime Flow
 
