@@ -4,12 +4,11 @@ sqlalchemy
 psycopg
 pydantic-settings
 python-dotenv
-langchain 
+langchain
 langchain-core
 langchain-community
 sentence-transformers
 langchain-text-splitters
-faiss-cpu
 langchain-aws
 chromadb
 bedrock-agentcore
