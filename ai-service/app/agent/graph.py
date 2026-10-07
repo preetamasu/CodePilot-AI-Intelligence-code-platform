@@ -6,16 +6,45 @@ from langgraph.checkpoint.memory import MemorySaver
 from app.agent.state import CodePilotState
 from langgraph.prebuilt import ToolNode, tools_condition
 from app.schemas import RetrieveRequest2
+from langchain_core.messages import HumanMessage, ToolMessage
 
 
 memory = MemorySaver()
 tools = [search_repository,list_repo_files,get_repository_file]
 
+SYSTEM_PROMPT = """
+You are CodePilot, an AI assistant for explaining software repositories.
+
+Use the repository tools only when needed.
+Do not call the same tool repeatedly.
+For architecture or overview questions, usually call list_repo_files once, then answer.
+For specific implementation questions, use search_repository or get_repository_file as needed.
+After you have enough evidence, write the final answer instead of calling more tools.
+Use at most 2 tool calls unless the user explicitly asks for deeper inspection.
+"""
+
 llm_with_tools = llm.bind_tools(tools)
 
 def chatbot(state: CodePilotState):
 
-    response = llm_with_tools.invoke(state["messages"])
+    tool_results_used = sum(
+        1 for message in state["messages"]
+        if isinstance(message, ToolMessage)
+    )
+
+    if tool_results_used >= 2:
+        response = llm.invoke(
+            state["messages"] + [
+                HumanMessage(
+                    content=(
+                        "Use the repository tool results already provided and write the final answer now. "
+                        "Do not call any more tools."
+                    )
+                )
+            ]
+        )
+    else:
+        response = llm_with_tools.invoke(state["messages"])
 
     return {
         "messages": [response]
@@ -42,12 +71,14 @@ def answer_with_agent(request: RetrieveRequest2):
     config = {
         'configurable':{
             "thread_id": request.thread_id 
-        }
+        },
+        "recursion_limit": 10
     }
     result = graph.invoke(
         {
             "repository_id":request.repo_id,
             "messages": [
+                {"role":"system","content":SYSTEM_PROMPT},
                 {"role":"user","content":request.question}
             ]
         },

@@ -23,8 +23,8 @@ def retrieveCode(request: RetrieveRequest):
 
     for document, metadata in zip(documents,metadatas):
         context_parts.append(
-           f"File: {metadata['path']}\n"
-           f"LANGUAGE:{metadata['language']}\n"
+           f"File: {metadata["path"]}\n"
+           f"LANGUAGE:{metadata["language"]}\n"
            f"CODE: \n{document}"
         )
     context = "\n\n---\n\n".join(context_parts)
@@ -57,7 +57,7 @@ def retrieveCode(request: RetrieveRequest):
     )
 
     sources = list({
-        metadata['path']
+        metadata["path"]
         for metadata in metadatas
     })
 
