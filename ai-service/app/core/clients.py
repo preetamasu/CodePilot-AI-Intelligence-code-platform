@@ -2,7 +2,7 @@ from app.core.config import *;
 from supabase import create_client, Client
 import chromadb
 from langchain_groq import ChatGroq
-from langchain_community.embeddings import FastEmbedEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 supabase: Client = create_client(url,key)
 
@@ -12,16 +12,17 @@ chroma_client = chromadb.CloudClient(
     database= os.getenv("CHROMA_DATABASE")
 )
 
-collection = chroma_client.get_or_create_collection(name="codepilot-fastembed",embedding_function=None)
+collection = chroma_client.get_or_create_collection(name="codepilot-google-embed",embedding_function=None)
 
 
-llm = ChatGroq( 
-          model=os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"), 
-          groq_api_key=os.getenv("GROQ_API_KEY"), 
-          temperature=0, 
+llm = ChatGroq(
+          model=os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"),
+          groq_api_key=os.getenv("GROQ_API_KEY"),
+          temperature=0,
 )
 
-bedrock_embeddings = FastEmbedEmbeddings(
-    model_name="BAAI/bge-small-en-v1.5"
+bedrock_embeddings = GoogleGenerativeAIEmbeddings(
+    model="gemini-embedding-2",
+    google_api_key=os.getenv("GOOGLE_API_KEY")
 )
 
